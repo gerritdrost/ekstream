@@ -42,6 +42,8 @@ class Numbers
      * @param int $step
      *
      * @return Stream
+     *
+     * @throws InvalidArgumentException
      */
     public static function range(int $start, int $end, int $step = 1)
     {

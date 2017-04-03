@@ -50,7 +50,11 @@ class Stream
      */
     public static function emptySet()
     {
-        return new self(yield from []);
+        $emptyGenerator = function () {
+            yield from [];
+        };
+
+        return new self($emptyGenerator());
     }
 
     /**
@@ -179,6 +183,36 @@ class Stream
     }
 
     /**
+     * @param callable $callable
+     *
+     * @return mixed
+     */
+    public function getFirstOrElse(callable $callable)
+    {
+        $closure = Closure::fromCallable($callable);
+
+        foreach ($this->yieldGenerator() as $value) {
+            return $value;
+        }
+
+        return $closure();
+    }
+
+    /**
+     * @param null $orElse
+     *
+     * @return mixed
+     */
+    public function getFirstOrElseGet($orElse = null)
+    {
+        foreach ($this->yieldGenerator() as $value) {
+            return $value;
+        }
+
+        return $orElse;
+    }
+
+    /**
      * @return Generator
      */
     public function toGenerator()
@@ -220,7 +254,7 @@ class Stream
     {
         $generator = $this->generator;
 
-        $emptyGenerator = function() {
+        $emptyGenerator = function () {
             yield from [];
         };
 

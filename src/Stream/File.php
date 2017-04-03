@@ -9,6 +9,8 @@ class File
 {
     /**
      * @return Stream
+     *
+     * @throws InvalidArgumentException
      */
     public static function linesFromResource(resource $handle)
     {
@@ -32,6 +34,8 @@ class File
      * @param string $path
      *
      * @return Stream
+     *
+     * @throws InvalidArgumentException
      */
     public static function linesFromFile(string $path)
     {
