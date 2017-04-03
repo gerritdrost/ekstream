@@ -1,0 +1,8 @@
+{
+  "name":"gerritdrost/exstream",
+  "autoload": {
+    "psr-4": {
+      "GerritDrost\\Ekstream\\": "src/"
+    }
+  }
+}
