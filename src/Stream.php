@@ -58,19 +58,19 @@ class Stream
     }
 
     /**
-     * @param callable $callable
+     * @param callable $filterFunction
      *
      * @return Stream
      */
-    public function filter(callable $callable)
+    public function filter(callable $filterFunction)
     {
-        $closure = Closure::fromCallable($callable);
+        $filterFunction = Closure::fromCallable($filterFunction);
 
         $generator = $this->yieldGenerator();
 
-        $newGenerator = function () use (&$generator, &$closure) {
+        $newGenerator = function () use (&$generator, &$filterFunction) {
             foreach ($generator as $value) {
-                $mayYield = $closure($value);
+                $mayYield = $filterFunction($value);
 
                 if ($mayYield === true)
                     yield $value;
@@ -81,19 +81,19 @@ class Stream
     }
 
     /**
-     * @param callable $callable
+     * @param callable $mapFunction
      *
      * @return Stream
      */
-    public function map(callable $callable)
+    public function map(callable $mapFunction)
     {
-        $closure = Closure::fromCallable($callable);
+        $mapFunction = Closure::fromCallable($mapFunction);
 
         $generator = $this->yieldGenerator();
 
-        $newGenerator = function () use (&$generator, &$closure) {
+        $newGenerator = function () use (&$generator, &$mapFunction) {
             foreach ($generator as $value) {
-                yield $closure($value);
+                yield $mapFunction($value);
             }
         };
 
@@ -129,21 +129,21 @@ class Stream
     }
 
     /**
-     * @param callable $callable
+     * @param callable $flatMapFunction
      *
      * @return Stream
      *
      * @throws Exception\WrongOutputType
      */
-    public function flatMap(callable $callable)
+    public function flatMap(callable $flatMapFunction)
     {
-        $closure = Closure::fromCallable($callable);
+        $flatMapFunction = Closure::fromCallable($flatMapFunction);
 
         $generator = $this->yieldGenerator();
 
-        $newGenerator = function () use (&$generator, &$closure) {
+        $newGenerator = function () use (&$generator, &$flatMapFunction) {
             foreach ($generator as $value) {
-                $innerStream = $closure($value);
+                $innerStream = $flatMapFunction($value);
 
                 if ($innerStream instanceof Stream)
                     $innerGenerator = $innerStream->generator;
@@ -159,6 +159,34 @@ class Stream
         return Stream::fromGenerator($newGenerator());
     }
 
+    /**
+     * @param callable $identityFunction
+     *
+     * @return array
+     */
+    public function toGroupedArray(callable $identityFunction)
+    {
+        $identityFunction = Closure::fromCallable($identityFunction);
+
+        $array = [];
+
+        $generator = $this->yieldGenerator();
+
+        foreach ($generator as $value) {
+            $identity = $identityFunction($value);
+
+            if (isset($array[$identity])) {
+                $identityArray = &$array[$identity];
+            } else {
+                $identityArray    = [];
+                $array[$identity] = &$identityArray;
+            }
+
+            $identityArray[] = $value;
+        }
+
+        return $array;
+    }
 
     /**
      * @return array
