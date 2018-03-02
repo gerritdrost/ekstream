@@ -2,30 +2,38 @@
 
 namespace GerritDrost\Ekstream\Stream;
 
+use Closure;
 use GerritDrost\Ekstream\Stream;
 use InvalidArgumentException;
 
 class File
 {
     /**
-     * @return Stream
+     * @param resource $handle
      *
-     * @throws InvalidArgumentException
+     * @param bool     $stripTrailingEol
+     *
+     * @return Stream
      */
-    public static function linesFromResource(resource $handle)
+    public static function linesFromResource($handle, bool $stripTrailingEol = true): Stream
     {
         if (!is_resource($handle)) {
             throw new InvalidArgumentException('Provided resource is not valid');
         }
 
-        $generator = function () use ($handle) {
-            $line = fgets($handle);
-
-            if ($line === false)
-                return;
-            else
-                yield $line;
-        };
+        if ($stripTrailingEol) {
+            $generator = function () use ($handle) {
+                while (($line = fgets($handle)) !== false) {
+                    yield self::stripTrailingEol($line);
+                }
+            };
+        } else {
+            $generator = function () use ($handle) {
+                while (($line = fgets($handle)) !== false) {
+                    yield $line;
+                }
+            };
+        }
 
         return Stream::fromGenerator($generator());
     }
@@ -33,24 +41,46 @@ class File
     /**
      * @param string $path
      *
+     * @param bool   $stripTrailingEol
+     *
      * @return Stream
      *
-     * @throws InvalidArgumentException
      */
-    public static function linesFromFile(string $path)
+    public static function linesFromFile(string $path, bool $stripTrailingEol = true): Stream
     {
-        if (!file_exists($path))
+        if (!file_exists($path)) {
             throw new InvalidArgumentException('Provided path does not exist or is not a file');
+        }
 
         $handle = fopen($path, 'r');
 
-        if (!is_resource($handle))
+        if (!is_resource($handle)) {
             throw new InvalidArgumentException('Provided resource is not valid');
+        }
 
+        if ($stripTrailingEol) {
+            $generator = function () use ($handle) {
+                while (($line = fgets($handle)) !== false) {
+                    yield self::stripTrailingEol($line);
+                }
+            };
+        } else {
+            $generator = function () use ($handle) {
+                while (($line = fgets($handle)) !== false) {
+                    yield $line;
+                }
+            };
+        }
         $generator = function () use ($handle) {
             try {
                 while (($line = fgets($handle)) !== false) {
-                    yield $line;
+                    $lineLength = mb_strlen($line);
+
+                    if ($lineLength > 0 && mb_substr($line, -1) === '\n') {
+                        yield mb_substr($line, 0, $lineLength - 1);
+                    } else {
+                        yield $line;
+                    }
                 }
             } finally {
                 @fclose($handle);
@@ -58,5 +88,21 @@ class File
         };
 
         return Stream::fromGenerator($generator());
+    }
+
+    /**
+     * @param string $line
+     *
+     * @return string
+     */
+    private static function stripTrailingEol(string $line): string
+    {
+        $lineLength = mb_strlen($line);
+
+        if ($lineLength > 0 && mb_substr($line, -1) === "\n") {
+            return mb_substr($line, 0, $lineLength - 1);
+        } else {
+            return $line;
+        }
     }
 }

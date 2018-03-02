@@ -6,7 +6,18 @@
       "GerritDrost\\Ekstream\\": "src/"
     }
   },
+
+  "autoload-dev": {
+    "psr-4": {
+      "GerritDrost\\Ekstream\\": "tests/"
+    }
+  },
+
   "require": {
     "php": ">=7.1.0"
+  },
+
+  "require-dev": {
+    "phpunit/phpunit": "^7.0.0"
   }
 }
