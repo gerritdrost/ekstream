@@ -12,11 +12,11 @@ class Numbers
      *
      * @param int $n
      *
-     * @return bool
+     * @return int
      */
-    private static function sign(int $n)
+    private static function sign(int $n): int
     {
-        return ($n > 0) - ($n < 0);
+        return (int)($n > 0) - (int)($n < 0);
     }
 
     /**
@@ -25,7 +25,7 @@ class Numbers
      *
      * @return Stream
      */
-    public static function generate(int $start, int $step)
+    public static function generate(int $start, int $step): Stream
     {
         $generator = function() use (&$start, &$step) {
             for ($i = $start; true; $i += $step) {
@@ -45,7 +45,7 @@ class Numbers
      *
      * @throws InvalidArgumentException
      */
-    public static function range(int $start, int $end, int $step = 1)
+    public static function range(int $start, int $end, int $step = 1): Stream
     {
         $diff = $end - $start;
 
@@ -53,17 +53,24 @@ class Numbers
         $stepSign = self::sign($step);
 
         if ($diffSign !== $stepSign) {
-            throw new InvalidArgumentException('Invalid step provided, $end is not reachable');
+            return Stream::fromArray([ $start ]);
         }
 
         // todo: only allow "exact" finishes (start = 0, end = 8, step = 3 should not be allowed)
-
-        $generator = function() use (&$start, &$end, &$step) {
-            for ($i = $start; $i >= $end; $i += $step) {
-                yield $i;
-            }
-        };
-
-        return Stream::fromGenerator($generator());
+        if ($diffSign > 0) {
+            $generator = function() use (&$start, &$end, &$step) {
+                for ($i = $start; $i <= $end; $i += $step) {
+                    yield $i;
+                }
+            };
+            return Stream::fromGenerator($generator());
+        } else {
+            $generator = function() use (&$start, &$end, &$step) {
+                for ($i = $start; $i >= $end; $i += $step) {
+                    yield $i;
+                }
+            };
+            return Stream::fromGenerator($generator());
+        }
     }
 }

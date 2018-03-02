@@ -107,8 +107,13 @@ class Stream
      */
     public function limit(int $n)
     {
-        if ($n < 0)
+        if ($n < 0) {
             throw new InvalidArgumentException('Stream::limit requires a positive integer as parameter');
+        }
+
+        if ($n === 0) {
+            return Stream::fromArray([]);
+        }
 
         $generator = $this->yieldGenerator();
 
