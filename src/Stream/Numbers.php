@@ -24,7 +24,7 @@ class Numbers
      *
      * @return Stream
      */
-    public static function generate(int $start, int $step): Stream
+    public static function generate(int $start, int $step = 1): Stream
     {
         $generator = function() use (&$start, &$step) {
             for ($i = $start; true; $i += $step) {
