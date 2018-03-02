@@ -1,8 +1,12 @@
 {
-  "name":"gerritdrost/exstream",
+  "name":"gerritdrost/ekstream",
+
   "autoload": {
     "psr-4": {
       "GerritDrost\\Ekstream\\": "src/"
     }
+  },
+  "require": {
+    "php": ">=7.1.0"
   }
 }
