@@ -3,7 +3,6 @@
 namespace GerritDrost\Ekstream\Stream;
 
 use GerritDrost\Ekstream\Stream;
-use InvalidArgumentException;
 
 class Numbers
 {
@@ -42,8 +41,6 @@ class Numbers
      * @param int $step
      *
      * @return Stream
-     *
-     * @throws InvalidArgumentException
      */
     public static function range(int $start, int $end, int $step = 1): Stream
     {
@@ -56,7 +53,6 @@ class Numbers
             return Stream::fromArray([ $start ]);
         }
 
-        // todo: only allow "exact" finishes (start = 0, end = 8, step = 3 should not be allowed)
         if ($diffSign > 0) {
             $generator = function() use (&$start, &$end, &$step) {
                 for ($i = $start; $i <= $end; $i += $step) {

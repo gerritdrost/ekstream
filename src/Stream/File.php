@@ -2,7 +2,6 @@
 
 namespace GerritDrost\Ekstream\Stream;
 
-use Closure;
 use GerritDrost\Ekstream\Stream;
 use InvalidArgumentException;
 
