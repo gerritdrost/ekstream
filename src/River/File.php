@@ -1,8 +1,8 @@
 <?php
 
-namespace GerritDrost\Ekstream\Stream;
+namespace GerritDrost\River;
 
-use GerritDrost\Ekstream\Stream;
+use GerritDrost\River;
 use InvalidArgumentException;
 
 class File
@@ -12,9 +12,9 @@ class File
      *
      * @param bool     $stripTrailingEol
      *
-     * @return Stream
+     * @return River
      */
-    public static function linesFromResource($handle, bool $stripTrailingEol = true): Stream
+    public static function linesFromResource($handle, bool $stripTrailingEol = true): River
     {
         if (!is_resource($handle)) {
             throw new InvalidArgumentException('Provided resource is not valid');
@@ -34,7 +34,7 @@ class File
             };
         }
 
-        return Stream::fromGenerator($generator());
+        return River::fromGenerator($generator());
     }
 
     /**
@@ -42,10 +42,10 @@ class File
      *
      * @param bool   $stripTrailingEol
      *
-     * @return Stream
+     * @return River
      *
      */
-    public static function linesFromFile(string $path, bool $stripTrailingEol = true): Stream
+    public static function linesFromFile(string $path, bool $stripTrailingEol = true): River
     {
         if (!file_exists($path)) {
             throw new InvalidArgumentException('Provided path does not exist or is not a file');
@@ -59,34 +59,27 @@ class File
 
         if ($stripTrailingEol) {
             $generator = function () use ($handle) {
-                while (($line = fgets($handle)) !== false) {
-                    yield self::stripTrailingEol($line);
+                try {
+                    while (($line = fgets($handle)) !== false) {
+                        yield self::stripTrailingEol($line);
+                    }
+                } finally {
+                    @fclose($handle);
                 }
             };
         } else {
             $generator = function () use ($handle) {
-                while (($line = fgets($handle)) !== false) {
-                    yield $line;
+                try {
+                    while (($line = fgets($handle)) !== false) {
+                        yield $line;
+                    }
+                } finally {
+                    @fclose($handle);
                 }
             };
         }
-        $generator = function () use ($handle) {
-            try {
-                while (($line = fgets($handle)) !== false) {
-                    $lineLength = mb_strlen($line);
 
-                    if ($lineLength > 0 && mb_substr($line, -1) === '\n') {
-                        yield mb_substr($line, 0, $lineLength - 1);
-                    } else {
-                        yield $line;
-                    }
-                }
-            } finally {
-                @fclose($handle);
-            }
-        };
-
-        return Stream::fromGenerator($generator());
+        return River::fromGenerator($generator());
     }
 
     /**

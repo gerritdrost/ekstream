@@ -1,8 +1,8 @@
 <?php
 
-namespace GerritDrost\Ekstream\Stream;
+namespace GerritDrost\River;
 
-use GerritDrost\Ekstream\Stream;
+use GerritDrost\River;
 use PDOStatement;
 
 class Pdo
@@ -10,7 +10,7 @@ class Pdo
     /**
      * @param PDOStatement $statement
      *
-     * @return Stream
+     * @return River
      */
     public static function fetchAssoc(PDOStatement $statement)
     {
@@ -20,7 +20,7 @@ class Pdo
     /**
      * @param PDOStatement $statement
      *
-     * @return Stream
+     * @return River
      */
     public static function fetchColumn(PDOStatement $statement)
     {
@@ -30,7 +30,7 @@ class Pdo
     /**
      * @param PDOStatement $statement
      *
-     * @return Stream
+     * @return River
      */
     public static function fetchNum(PDOStatement $statement)
     {
@@ -40,7 +40,7 @@ class Pdo
     /**
      * @param PDOStatement $statement
      *
-     * @return Stream
+     * @return River
      */
     public static function fetchBoth(PDOStatement $statement)
     {
@@ -51,7 +51,7 @@ class Pdo
      * @param PDOStatement $statement
      * @param int|null     $fetchStyle
      *
-     * @return Stream
+     * @return River
      */
     private static function fetch(PDOStatement $statement, int $fetchStyle)
     {
@@ -61,6 +61,6 @@ class Pdo
             }
         };
 
-        return Stream::fromGenerator($generator());
+        return River::fromGenerator($generator());
     }
 }

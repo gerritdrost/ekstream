@@ -1,8 +1,8 @@
 <?php
 
-namespace GerritDrost\Ekstream\Stream;
+namespace GerritDrost\River;
 
-use GerritDrost\Ekstream\Stream;
+use GerritDrost\River;
 
 class Numbers
 {
@@ -22,9 +22,9 @@ class Numbers
      * @param int $start
      * @param int $step
      *
-     * @return Stream
+     * @return River
      */
-    public static function generate(int $start, int $step = 1): Stream
+    public static function generate(int $start, int $step = 1): River
     {
         $generator = function() use (&$start, &$step) {
             for ($i = $start; true; $i += $step) {
@@ -32,7 +32,7 @@ class Numbers
             }
         };
 
-        return Stream::fromGenerator($generator());
+        return River::fromGenerator($generator());
     }
 
     /**
@@ -40,9 +40,9 @@ class Numbers
      * @param int $end
      * @param int $step
      *
-     * @return Stream
+     * @return River
      */
-    public static function range(int $start, int $end, int $step = 1): Stream
+    public static function range(int $start, int $end, int $step = 1): River
     {
         $diff = $end - $start;
 
@@ -50,7 +50,7 @@ class Numbers
         $stepSign = self::sign($step);
 
         if ($diffSign !== $stepSign) {
-            return Stream::fromArray([ $start ]);
+            return River::fromArray([$start ]);
         }
 
         if ($diffSign > 0) {
@@ -59,14 +59,14 @@ class Numbers
                     yield $i;
                 }
             };
-            return Stream::fromGenerator($generator());
+            return River::fromGenerator($generator());
         } else {
             $generator = function() use (&$start, &$end, &$step) {
                 for ($i = $start; $i >= $end; $i += $step) {
                     yield $i;
                 }
             };
-            return Stream::fromGenerator($generator());
+            return River::fromGenerator($generator());
         }
     }
 }

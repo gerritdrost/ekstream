@@ -1,6 +1,6 @@
 <?php
 
-namespace GerritDrost\Ekstream\Stream;
+namespace GerritDrost\River;
 
 use LogicException;
 use PDOStatement;

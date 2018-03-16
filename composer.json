@@ -1,15 +1,15 @@
 {
-  "name":"gerritdrost/ekstream",
+  "name":"gerritdrost/river",
 
   "autoload": {
     "psr-4": {
-      "GerritDrost\\Ekstream\\": "src/"
+      "GerritDrost\\": "src/"
     }
   },
 
   "autoload-dev": {
     "psr-4": {
-      "GerritDrost\\Ekstream\\": "tests/"
+      "GerritDrost\\": "tests/"
     }
   },
 

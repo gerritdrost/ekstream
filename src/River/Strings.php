@@ -1,9 +1,9 @@
 <?php
 
-namespace GerritDrost\Ekstream\Stream;
+namespace GerritDrost\River;
 
 use Generator;
-use GerritDrost\Ekstream\Stream;
+use GerritDrost\River;
 
 class Strings
 {
@@ -28,18 +28,18 @@ class Strings
     /**
      * @param string $string
      *
-     * @return Stream
+     * @return River
      */
     public static function chars(string $string)
     {
-        return Stream::fromGenerator(self::createCharGenerator($string));
+        return River::fromGenerator(self::createCharGenerator($string));
     }
 
     /**
      * @param string $string
      * @param array $chars
      *
-     * @return Stream
+     * @return River
      */
     public static function split(string $string, array $chars = ["\t", "\r", "\n", ' ']) {
         $generator = function() use (&$string, &$chars) {
@@ -64,6 +64,6 @@ class Strings
             }
         };
 
-        return Stream::fromGenerator($generator());
+        return River::fromGenerator($generator());
     }
 }

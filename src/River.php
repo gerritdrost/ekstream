@@ -1,12 +1,12 @@
 <?php
 
-namespace GerritDrost\Ekstream;
+namespace GerritDrost;
 
 use Closure;
 use Generator;
 use InvalidArgumentException;
 
-class Stream
+class River
 {
     /**
      * @var Generator the backing generator
@@ -24,7 +24,7 @@ class Stream
     /**
      * @param array $array
      *
-     * @return Stream
+     * @return River
      */
     public static function fromArray(array $array)
     {
@@ -38,7 +38,7 @@ class Stream
     /**
      * @param Generator $generator
      *
-     * @return Stream
+     * @return River
      */
     public static function fromGenerator(Generator $generator)
     {
@@ -46,7 +46,7 @@ class Stream
     }
 
     /**
-     * @return Stream
+     * @return River
      */
     public static function emptySet()
     {
@@ -60,7 +60,7 @@ class Stream
     /**
      * @param callable $filterFunction
      *
-     * @return Stream
+     * @return River
      */
     public function filter(callable $filterFunction)
     {
@@ -77,13 +77,13 @@ class Stream
             }
         };
 
-        return Stream::fromGenerator($newGenerator());
+        return River::fromGenerator($newGenerator());
     }
 
     /**
      * @param callable $mapFunction
      *
-     * @return Stream
+     * @return River
      */
     public function map(callable $mapFunction)
     {
@@ -97,22 +97,41 @@ class Stream
             }
         };
 
-        return Stream::fromGenerator($newGenerator());
+        return River::fromGenerator($newGenerator());
+    }
+
+    /**
+     * @param mixed    $initialValue
+     * @param callable $reduceFunction
+     *
+     * @return mixed
+     */
+    public function reduce($initialValue, callable $reduceFunction)
+    {
+        $result = $initialValue;
+
+        $generator = $this->yieldGenerator();
+
+        foreach ($generator as $value) {
+            $result = $reduceFunction($result, $value);
+        }
+
+        return $result;
     }
 
     /**
      * @param int $n
      *
-     * @return Stream
+     * @return River
      */
     public function limit(int $n)
     {
         if ($n < 0) {
-            throw new InvalidArgumentException('Stream::limit requires a positive integer as parameter');
+            throw new InvalidArgumentException('River::limit requires a positive integer as parameter');
         }
 
         if ($n === 0) {
-            return Stream::fromArray([]);
+            return River::fromArray([]);
         }
 
         $generator = $this->yieldGenerator();
@@ -130,13 +149,13 @@ class Stream
             }
         };
 
-        return Stream::fromGenerator($newGenerator());
+        return River::fromGenerator($newGenerator());
     }
 
     /**
      * @param callable $flatMapFunction
      *
-     * @return Stream
+     * @return River
      *
      * @throws Exception\WrongOutputType
      */
@@ -150,10 +169,10 @@ class Stream
             foreach ($generator as $value) {
                 $innerStream = $flatMapFunction($value);
 
-                if ($innerStream instanceof Stream)
+                if ($innerStream instanceof River)
                     $innerGenerator = $innerStream->generator;
                 else
-                    throw new Exception\WrongOutputType(Stream::class, self::getType($innerStream));
+                    throw new Exception\WrongOutputType(River::class, self::getType($innerStream));
 
                 foreach ($innerGenerator as $innerValue) {
                     yield $innerValue;
@@ -161,7 +180,7 @@ class Stream
             }
         };
 
-        return Stream::fromGenerator($newGenerator());
+        return River::fromGenerator($newGenerator());
     }
 
     /**

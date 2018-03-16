@@ -1,10 +1,10 @@
 <?php
 
-namespace GerritDrost\Ekstream;
+namespace GerritDrost;
 
 use PHPUnit\Framework\TestCase;
 
-class StreamTest extends TestCase
+class RiverTest extends TestCase
 {
     public function testFromArray()
     {
@@ -18,14 +18,14 @@ class StreamTest extends TestCase
 
         $this->assertEquals(
             count($numerals),
-            Stream
+            River
                 ::fromArray($numerals)
                 ->count()
         );
 
         $this->assertEquals(
             $numerals,
-            Stream
+            River
                 ::fromArray($numerals)
                 ->toArray()
         );
@@ -45,14 +45,14 @@ class StreamTest extends TestCase
                 'Red',
                 'Brown',
             ],
-            Stream
+            River
                 ::fromGenerator($generator())
                 ->toArray()
         );
 
         $this->assertEquals(
             3,
-            Stream
+            River
                 ::fromGenerator($generator())
                 ->count()
         );

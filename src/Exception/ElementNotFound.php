@@ -1,8 +1,8 @@
 <?php
 
-namespace GerritDrost\Ekstream\Exception;
+namespace River\Exception;
 
-use GerritDrost\Ekstream\Exception;
+use River\Exception;
 
 class ElementNotFound extends Exception
 {
